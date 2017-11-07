@@ -1,4 +1,5 @@
 import Data.Char (isNumber, digitToInt)
+import Data.List 
 
 --Ex1
 subtotal :: Num a => [a] -> [a]
@@ -41,6 +42,7 @@ sortType xs | and [ x < y | (x,y) <- sortType' xs ] = Ascending
             | otherwise = NotSorted
 
 --Ex5 
+rpcalc :: [Char] -> Int
 rpcalc xs | null result = error "Empty stack"
           | length result > 1 = error "Invalid stack"
           | otherwise = head result
@@ -53,6 +55,14 @@ rpcalc' (x:xs) stack | x == '+' = rpcalc' xs ((head $ tail stack) + (head stack)
                      | x == '-' = rpcalc' xs ((head $ tail stack) - (head stack): drop 2 stack)
                      | isNumber x = rpcalc' xs ((digitToInt x) : stack)
                      | otherwise = error "Wrong input"
+
+--Ex6
+neighbours' (px, py) (x1, y1) (x2, y2) =  compare (sqrt((x1-px)^2 + (y1-py)^2)) (sqrt((x2-px)^2 + (y2-py)^2))
+
+neighbours k p xs = take k (sortBy (neighbours' p) xs)
+
+
+
               
 
 
