@@ -1,3 +1,5 @@
+import Data.Char (isNumber, digitToInt)
+
 --Ex1
 subtotal :: Num a => [a] -> [a]
 subtotal' i xs = sum(take (i+1) xs)
@@ -36,12 +38,22 @@ sortType xs | and [ x < y | (x,y) <- sortType' xs ] = Ascending
             | and [ x <= y | (x,y) <- sortType' xs ] = NonDescending
             | and [ x >= y | (x,y) <- sortType' xs ] = NonAscending
             | and [ x > y | (x,y) <- sortType' xs ] = Descending
-            |otherwise = NotSorted
+            | otherwise = NotSorted
 
 --Ex5 
-rpcalc xs | length xs > 2 = 
+rpcalc xs | null result = error "Empty stack"
+          | length result > 1 = error "Invalid stack"
+          | otherwise = head result
+          where result = rpcalc' xs []
 
-
+rpcalc' [] stack = stack
+rpcalc' (x:xs) stack | x == '+' = rpcalc' xs ((head $ tail stack) + (head stack): drop 2 stack)
+                     | x == '*' = rpcalc' xs ((head $ tail stack) * (head stack): drop 2 stack)
+                     | x == '/' = rpcalc' xs ((head $ tail stack) `div` (head stack): drop 2 stack)
+                     | x == '-' = rpcalc' xs ((head $ tail stack) - (head stack): drop 2 stack)
+                     | isNumber x = rpcalc' xs ((digitToInt x) : stack)
+                     | otherwise = error "Wrong input"
+              
 
 
 
