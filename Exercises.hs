@@ -1,7 +1,6 @@
 import Data.Char (isNumber, digitToInt)
 import Data.List 
 
-
 --Ex1
 subtotal :: Num a => [a] -> [a]
 subtotal' i xs = sum(take (i+1) xs)
@@ -58,6 +57,7 @@ rpcalc' (x:xs) stack | x == '+' = rpcalc' xs ((head $ tail stack) + (head stack)
                      | otherwise = error "Wrong input"
 
 --Ex6
+neighbours :: (Floating a, Ord a) => Int -> (a,a) -> [(a,a)] -> [(a,a)]
 neighbours k p xs = take k (sortBy (neighbours' p) xs)
 
 neighbours' (px, py) (x1, y1) (x2, y2) =  compare (sqrt((x1-px)^2 + (y1-py)^2)) (sqrt((x2-px)^2 + (y2-py)^2))
@@ -73,9 +73,12 @@ balanced (Node lt _ rt) | diffInDepth <= 1 = True
                         | otherwise = False
                          where diffInDepth = abs(balanced' lt - balanced' rt)
                       
+--Ex8
+newtonRootSequence :: Double -> [Double]
+newtonRootSequence d = iterate (\i -> (i + d/i) / 2) 1
 
-
-
+--newtonRoot :: Double -> Double -> Double
+newtonRoot d epsilon = head ([j | (i,j) <- zip (newtonRootSequence d) (tail (newtonRootSequence d)), epsilon >= abs(i - j)])
 
 
 
