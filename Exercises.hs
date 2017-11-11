@@ -116,7 +116,40 @@ decode''' xs | length xs == 0 = []
 decode xs | length result == length xs `div` 9 = result
           | otherwise = []
           where result = decode''' xs 
+
+--Ex14
+
+type Subst = Assoc Char Bool
+type Assoc k v = [ (k,v) ]
+data Prop = Const Bool | Var Char | Not Prop | And Prop Prop | Imply Prop Prop 
+--isSat :: Prop -> [Subst]
+
+find' :: Eq k => k -> Assoc k v -> v
+find' k t = head [v | (k', v) <- t, k == k']
+
+isSat' _ (Const b) = b
+isSat' a (Var b) = find' b a
+isSat' a (Not b) = not $ isSat' a b
+isSat' a (And b c) = isSat' a b && isSat' a c
+isSat' a (Imply b c) = isSat' a b <= isSat' a c 
+
+isSat'' (Const _) = []
+isSat'' (Var a) = [a]
+isSat'' (Not a) = isSat'' a
+isSat'' (And a b) = isSat'' a ++ isSat'' b
+isSat'' (Imply a b) = isSat'' a ++ isSat'' b
+
+--all possible combinations
+isSat''' 0 = [[]]
+isSat''' a = map (False :) all ++ map (True :) all
+             where all = isSat''' (a - 1)
+
+isSat'''' a = map (zip vs) (isSat''' (length vs))
+           where vs = nub (isSat'' a)
+
+isSat s = head [binding | binding <- isSat'''' s, isSat' binding s]
             
+
 
 
 
