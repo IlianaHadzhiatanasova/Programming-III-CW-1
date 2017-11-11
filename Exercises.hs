@@ -60,7 +60,9 @@ rpcalc' (x:xs) stack | x == '+' = rpcalc' xs ((head $ tail stack) + (head stack)
 neighbours :: (Floating a, Ord a) => Int -> (a,a) -> [(a,a)] -> [(a,a)]
 neighbours k p xs = take k (sortBy (neighbours' p) xs)
 
+--could remove sqrt 
 neighbours' (px, py) (x1, y1) (x2, y2) =  compare (sqrt((x1-px)^2 + (y1-py)^2)) (sqrt((x2-px)^2 + (y2-py)^2))
+
 
 --Ex7
 data SearchTree = Node SearchTree Int SearchTree | Leaf Int deriving Show
@@ -77,12 +79,22 @@ balanced (Node lt _ rt) | diffInDepth <= 1 = True
 newtonRootSequence :: Double -> [Double]
 newtonRootSequence d = iterate (\i -> (i + d/i) / 2) 1
 
---newtonRoot :: Double -> Double -> Double
-newtonRoot d epsilon = head ([j | (i,j) <- zip (newtonRootSequence d) (tail (newtonRootSequence d)), epsilon >= abs(i - j)])
+newtonRoot :: Double -> Double -> Double
+newtonRoot d epsilon = head [j | (i,j) <- zip (newtonRootSequence d) (tail (newtonRootSequence d)), abs(i-j) <= epsilon]
+                    
+--Ex9
+hyperOperator :: Int -> Int -> Int -> Int
+hyperOperator operator a b | operator == 0 = b + 1
+                           | operator == 1 = a + b
+                           | operator == 2 = a*b
+                           | operator == 3 = a^b
+                           | otherwise = hyperOperator (operator - 1) a (hyperOperator operator a (b - 1))
 
-
-
-
+hyperOperator' operator a b | operator == 0 = b + 1
+                            | operator == 1 && b == 0 = a
+                            | operator == 2 && b == 0 = 0
+                            | operator >= 3 && b == 0 = 1 
+                            | otherwise = hyperOperator' (operator - 1) a (hyperOperator' operator a (b - 1))
 
 
 
