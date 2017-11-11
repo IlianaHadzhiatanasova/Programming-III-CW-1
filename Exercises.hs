@@ -85,16 +85,10 @@ newtonRoot d epsilon = head [j | (i,j) <- zip (newtonRootSequence d) (tail (newt
 --Ex9
 hyperOperator :: Int -> Int -> Int -> Int
 hyperOperator operator a b | operator == 0 = b + 1
-                           | operator == 1 = a + b
-                           | operator == 2 = a*b
-                           | operator == 3 = a^b
-                           | otherwise = hyperOperator (operator - 1) a (hyperOperator operator a (b - 1))
-
-hyperOperator' operator a b | operator == 0 = b + 1
-                            | operator == 1 && b == 0 = a
+                            | operator == 1 = a + b 
                             | operator == 2 && b == 0 = 0
-                            | operator >= 3 && b == 0 = 1 
-                            | otherwise = hyperOperator' (operator - 1) a (hyperOperator' operator a (b - 1))
+                            | operator > 2 && b == 1 = a 
+                            | otherwise = hyperOperator (operator - 1) (hyperOperator operator a (b-1)) a
 
 --Ex10
 encode :: String -> [Int]
