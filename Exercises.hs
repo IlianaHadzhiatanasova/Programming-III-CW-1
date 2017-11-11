@@ -109,14 +109,20 @@ encode xs = concat $ map (\x -> encode'' (encode' (ord x) 7)) xs
 
 
 --Ex11
-
+--zip reverse xs with 0..
 decode' xs = chr $ sum [ a*(2^b) | (a,b) <- zip xs [length xs - 1, length xs - 2..0]]
 
-decode xs | length xs == 0 = [] 
-          | otherwise = decode' (take 8 xs) : decode (drop 9 xs)  
+decode'' xs = even (sum (init xs) + (last xs)) 
 
+decode''' xs | length xs == 0 = [] 
+             | length xs `mod` 9 /= 0 = []
+             | not (decode'' (take 9 xs)) = []
+             | otherwise = decode' (take 8 xs) : decode (drop 9 xs)  
 
-
+decode xs | length result == length xs `div` 9 = result
+          | otherwise = []
+          where result = decode''' xs 
+            
 
 
 
