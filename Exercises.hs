@@ -1,4 +1,4 @@
-import Data.Char (isNumber, digitToInt)
+import Data.Char 
 import Data.List 
 
 --Ex1
@@ -95,6 +95,27 @@ hyperOperator' operator a b | operator == 0 = b + 1
                             | operator == 2 && b == 0 = 0
                             | operator >= 3 && b == 0 = 1 
                             | otherwise = hyperOperator' (operator - 1) a (hyperOperator' operator a (b - 1))
+
+--Ex10
+encode :: String -> [Int]
+encode' n i | i == (-1) = []
+            | n - 2^i >= 0 = 1 : encode' (n-2^i) (i - 1)
+            | otherwise = 0 : encode' n (i-1)
+
+encode'' xs | odd (sum xs) = xs ++ [1]
+            | otherwise = xs ++ [0]
+
+encode xs = concat $ map (\x -> encode'' (encode' (ord x) 7)) xs
+
+
+--Ex11
+
+decode' xs = chr $ sum [ a*(2^b) | (a,b) <- zip xs [length xs - 1, length xs - 2..0]]
+
+decode xs | length xs == 0 = [] 
+          | otherwise = decode' (take 8 xs) : decode (drop 9 xs)  
+
+
 
 
 
