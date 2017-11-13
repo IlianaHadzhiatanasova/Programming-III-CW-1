@@ -75,12 +75,16 @@ data SearchTree = Node SearchTree Int SearchTree | Leaf Int deriving Show
 balanced :: SearchTree -> Bool
 
 balanced' (Leaf _) = 1
-balanced' (Node lt _ rt) = balanced' lt + balanced' rt + 1      
+balanced' (Node lt _ rt) = max (balanced' lt) (balanced' rt) + 1
+
+balanced'' (Leaf i) = [i]
+balanced'' (Node lt i rt) = balanced'' lt ++ [i] ++ balanced'' rt      
 
 balanced (Leaf _ ) = True
-balanced (Node lt _ rt) | depthDifference <= 1 = True
-                        | otherwise = False
-                         where depthDifference = abs(balanced' lt - balanced' rt) --maximum?
+balanced (Node lt i rt) = depthDifference <= 1 && ordered
+                         where depthDifference = abs(balanced' lt - balanced' rt) 
+                               check = balanced'' (Node lt i rt) 
+                               ordered = and [ x < y | (x,y) <- zip check (tail check)]
                       
 --Ex8
 newtonRootSequence :: Double -> [Double]
@@ -121,6 +125,7 @@ decode'' xs = even (sum (init xs) + (last xs))
 
 decode''' xs | length xs == 0 = [] 
              | length xs `mod` 9 /= 0 = []
+             | length (filter (\x -> x/= 0 && x/= 1) xs) /= 0 = []
              | not (decode'' (take 9 xs)) = []
              | otherwise = decode' (take 8 xs) : decode (drop 9 xs)  
 
@@ -137,7 +142,7 @@ makeChange n (x:xs) | length solutions >=1 = head $ sortBy (\a b -> compare (sum
                     | otherwise = [-1]
                      where solutions = [solution | y <- [0..n `div` x], let solution = y: makeChange (n - x*y) xs, length (filter (<0) solution) == 0]
 
---Ex13
+--Ex13 numbers no bigger than the base 
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
 ------------------------------------------------------------------------------
@@ -147,8 +152,8 @@ makeChange n (x:xs) | length solutions >=1 = head $ sortBy (\a b -> compare (sum
 type Subst = Assoc Char Bool
 type Assoc k v = [(k,v)]
 data Prop = Const Bool | Var Char | Not Prop | And Prop Prop | Imply Prop Prop 
--- should be just Subst? 
---isSat :: Prop -> Subst
+
+isSat :: Prop -> [Subst]
 
 isSat' _ (Const b) = b
 isSat' a (Var b) = isSat''''' b a
@@ -173,7 +178,7 @@ isSat'''' a = map (zip vs) (isSat''' (length vs))
 isSat''''' :: Eq k => k -> Assoc k v -> v
 isSat''''' k t = head [v | (k', v) <- t, k == k']
 
-isSat s =  [binding | binding <- isSat'''' s, isSat' binding s] --head of bindings or just bindings? 
+isSat s = [binding | binding <- isSat'''' s, isSat' binding s]
             
 
 --Ex15
@@ -190,6 +195,11 @@ pair' z = (x,y)
 isCantorPair n = fst y + snd y == snd x
                  where x = pair' n
                        y = pair' $ fst x
+
+--TODO finish ex 13 
+--TODO add comments
+--TODO check types 
+--TODO test 
                     
               
 
