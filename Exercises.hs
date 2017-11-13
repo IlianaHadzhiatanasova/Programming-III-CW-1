@@ -3,19 +3,25 @@ import Data.List
 
 --Ex1
 subtotal :: Num a => [a] -> [a]
+
 subtotal' i xs = sum(take (i+1) xs)
+
 subtotal xs = [subtotal' y xs | y <- [0..length xs - 1]]
 
 
 --Ex2
 histogram :: Int -> [Int] -> [Int]
+
 histogram' n xs = [[n*i..(n*(i+1) - 1)] | i <- [0..((maximum xs) `div` n)]]
+
 histogram'' x xs = length[x' | x' <- xs, x == x']
+
 histogram n xs = [sum[histogram'' xi xs | xi <- x] | x <- histogram' n xs]
 
 
 --Ex3
 meetsOffer :: String -> Int -> Bool
+
 meetsOffer' [] = 0
 meetsOffer' ('A':'*':xs) = 56 + meetsOffer' xs
 meetsOffer' (x:xs) |x == 'A' = 48 + meetsOffer' xs
@@ -30,8 +36,8 @@ meetsOffer xs n | meetsOffer' xs < n = False
 
 --Ex4
 data TypeOfSort = Ascending | NonDescending | Constant | NonAscending | Descending | NotSorted deriving Show
-
 sortType :: Ord a => [a] -> TypeOfSort 
+
 sortType' xs = zip xs (tail xs)
 
 sortType xs | and [ x < y | (x,y) <- sortType' xs ] = Ascending
@@ -43,10 +49,6 @@ sortType xs | and [ x < y | (x,y) <- sortType' xs ] = Ascending
 
 --Ex5 
 rpcalc :: [Char] -> Int
-rpcalc xs | null result = error "Empty stack"
-          | length result > 1 = error "Invalid stack"
-          | otherwise = head result
-          where result = rpcalc' xs []
 
 rpcalc' [] stack = stack
 rpcalc' (x:xs) stack | x == '+' = rpcalc' xs ((head $ tail stack) + (head stack): drop 2 stack)
@@ -56,34 +58,42 @@ rpcalc' (x:xs) stack | x == '+' = rpcalc' xs ((head $ tail stack) + (head stack)
                      | isNumber x = rpcalc' xs ((digitToInt x) : stack)
                      | otherwise = error "Wrong input"
 
+rpcalc xs | null result = error "Empty stack"
+          | length result > 1 = error "Invalid stack"
+          | otherwise = head result
+          where result = rpcalc' xs []
+
 --Ex6
 neighbours :: (Floating a, Ord a) => Int -> (a,a) -> [(a,a)] -> [(a,a)]
+
+neighbours' (px, py) (x1, y1) (x2, y2) =  compare ((x1-px)^2 + (y1-py)^2) ((x2-px)^2 + (y2-py)^2)
+
 neighbours k p xs = take k (sortBy (neighbours' p) xs)
-
---could remove sqrt 
-neighbours' (px, py) (x1, y1) (x2, y2) =  compare (sqrt((x1-px)^2 + (y1-py)^2)) (sqrt((x2-px)^2 + (y2-py)^2))
-
 
 --Ex7
 data SearchTree = Node SearchTree Int SearchTree | Leaf Int deriving Show
+balanced :: SearchTree -> Bool
 
-balanced' (Leaf x) = 1
+balanced' (Leaf _) = 1
 balanced' (Node lt _ rt) = balanced' lt + balanced' rt + 1      
 
 balanced (Leaf _ ) = True
-balanced (Node lt _ rt) | diffInDepth <= 1 = True
+balanced (Node lt _ rt) | depthDifference <= 1 = True
                         | otherwise = False
-                         where diffInDepth = abs(balanced' lt - balanced' rt)
+                         where depthDifference = abs(balanced' lt - balanced' rt) --maximum?
                       
 --Ex8
 newtonRootSequence :: Double -> [Double]
+
 newtonRootSequence d = iterate (\i -> (i + d/i) / 2) 1
 
 newtonRoot :: Double -> Double -> Double
+
 newtonRoot d epsilon = head [j | (i,j) <- zip (newtonRootSequence d) (tail (newtonRootSequence d)), abs(i-j) <= epsilon]
                     
 --Ex9
 hyperOperator :: Int -> Int -> Int -> Int
+
 hyperOperator operator a b  | (operator >= 3 && b == 0) || (operator >= 4 && even b && a == 0) = 1
                             | operator == 0 = b + 1
                             | operator == 1 = a + b 
@@ -93,6 +103,7 @@ hyperOperator operator a b  | (operator >= 3 && b == 0) || (operator >= 4 && eve
 
 --Ex10
 encode :: String -> [Int]
+
 encode' n i | i == (-1) = []
             | n - 2^i >= 0 = 1 : encode' (n-2^i) (i - 1)
             | otherwise = 0 : encode' n (i-1)
@@ -104,7 +115,6 @@ encode xs = concat $ map (\x -> encode'' (encode' (ord x) 7)) xs
 
 
 --Ex11
---zip reverse xs with 0..
 decode' xs = chr $ sum [ a*(2^b) | (a,b) <- zip xs [length xs - 1, length xs - 2..0]]
 
 decode'' xs = even (sum (init xs) + (last xs)) 
@@ -119,22 +129,26 @@ decode xs | length result == length xs `div` 9 = result
           where result = decode''' xs 
 
 --Ex12
- 
---makeChange n xs | n == 0  || (minimum xs) > n = [-1] --copy (-1) along the length of the list somehow
-  --              | null xs = []
-    --            | otherwise = 
+makeChange :: Integral t => t -> [t] -> [t]
 
-
+makeChange 0 [] = []
+makeChange n [] = [-1]
+makeChange n (x:xs) | length solutions >=1 = head $ sortBy (\a b -> compare (sum a) (sum b)) solutions
+                    | otherwise = [-1]
+                     where solutions = [solution | y <- [0..n `div` x], let solution = y: makeChange (n - x*y) xs, length (filter (<0) solution) == 0]
 
 --Ex13
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 --Ex14
 type Subst = Assoc Char Bool
 type Assoc k v = [(k,v)]
 data Prop = Const Bool | Var Char | Not Prop | And Prop Prop | Imply Prop Prop 
-
-isSat''''' :: Eq k => k -> Assoc k v -> v
-isSat''''' k t = head [v | (k', v) <- t, k == k']
+-- should be just Subst? 
+--isSat :: Prop -> Subst
 
 isSat' _ (Const b) = b
 isSat' a (Var b) = isSat''''' b a
@@ -156,12 +170,14 @@ isSat''' a = map (False :) all ++ map (True :) all
 isSat'''' a = map (zip vs) (isSat''' (length vs))
            where vs = nub (isSat'' a)
 
--- should be just Subst? 
---isSat :: Prop -> Subst
-isSat s = head [binding | binding <- isSat'''' s, isSat' binding s]
+isSat''''' :: Eq k => k -> Assoc k v -> v
+isSat''''' k t = head [v | (k', v) <- t, k == k']
+
+isSat s =  [binding | binding <- isSat'''' s, isSat' binding s] --head of bindings or just bindings? 
             
 
 --Ex15
+isCantorPair :: Integral t => t -> Bool
 
 pair x y = y + (xysum) * (xysum +1) `div` 2 
            where xysum = x+y
