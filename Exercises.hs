@@ -11,7 +11,8 @@ subtotal xs = [subtotal' y xs | y <- [0..length xs - 1]]
 histogram :: Int -> [Int] -> [Int]
 histogram' n xs = [[n*i..(n*(i+1) - 1)] | i <- [0..((maximum xs) `div` n)]]
 histogram'' x xs = length[x' | x' <- xs, x == x']
-histogram n xs = [ sum[histogram'' xi xs|xi <- x] | x <- histogram' n xs]
+histogram n xs = [sum[histogram'' xi xs | xi <- x] | x <- histogram' n xs]
+
 
 --Ex3
 meetsOffer :: String -> Int -> Bool
@@ -29,11 +30,10 @@ meetsOffer xs n | meetsOffer' xs < n = False
 
 --Ex4
 data TypeOfSort = Ascending | NonDescending | Constant | NonAscending | Descending | NotSorted deriving Show
+
 sortType :: Ord a => [a] -> TypeOfSort 
 sortType' xs = zip xs (tail xs)
 
-sortType [] = Ascending
-sortType [a] = Ascending
 sortType xs | and [ x < y | (x,y) <- sortType' xs ] = Ascending
             | and [ x == y | (x,y) <- sortType' xs ] = Constant
             | and [ x <= y | (x,y) <- sortType' xs ] = NonDescending
@@ -84,7 +84,8 @@ newtonRoot d epsilon = head [j | (i,j) <- zip (newtonRootSequence d) (tail (newt
                     
 --Ex9
 hyperOperator :: Int -> Int -> Int -> Int
-hyperOperator operator a b | operator == 0 = b + 1
+hyperOperator operator a b  | (operator >= 3 && b == 0) || (operator >= 4 && even b && a == 0) = 1
+                            | operator == 0 = b + 1
                             | operator == 1 = a + b 
                             | operator == 2 && b == 0 = 0
                             | operator > 2 && b == 1 = a 
@@ -117,18 +118,26 @@ decode xs | length result == length xs `div` 9 = result
           | otherwise = []
           where result = decode''' xs 
 
+--Ex12
+ 
+--makeChange n xs | n == 0  || (minimum xs) > n = [-1] --copy (-1) along the length of the list somehow
+  --              | null xs = []
+    --            | otherwise = 
+
+
+
+--Ex13
+
 --Ex14
-
 type Subst = Assoc Char Bool
-type Assoc k v = [ (k,v) ]
+type Assoc k v = [(k,v)]
 data Prop = Const Bool | Var Char | Not Prop | And Prop Prop | Imply Prop Prop 
---isSat :: Prop -> [Subst]
 
-find' :: Eq k => k -> Assoc k v -> v
-find' k t = head [v | (k', v) <- t, k == k']
+isSat''''' :: Eq k => k -> Assoc k v -> v
+isSat''''' k t = head [v | (k', v) <- t, k == k']
 
 isSat' _ (Const b) = b
-isSat' a (Var b) = find' b a
+isSat' a (Var b) = isSat''''' b a
 isSat' a (Not b) = not $ isSat' a b
 isSat' a (And b c) = isSat' a b && isSat' a c
 isSat' a (Imply b c) = isSat' a b <= isSat' a c 
@@ -147,13 +156,25 @@ isSat''' a = map (False :) all ++ map (True :) all
 isSat'''' a = map (zip vs) (isSat''' (length vs))
            where vs = nub (isSat'' a)
 
+-- should be just Subst? 
+--isSat :: Prop -> Subst
 isSat s = head [binding | binding <- isSat'''' s, isSat' binding s]
             
 
+--Ex15
 
+pair x y = y + (xysum) * (xysum +1) `div` 2 
+           where xysum = x+y
 
+pair' z = (x,y) 
+          where t = floor ((sqrt(8 * (fromIntegral z) +1) -1) / 2)
+                x = (t*(t+3) `div` 2) - z
+                y = z - t * (t+1) `div` 2 
 
-
-
+isCantorPair n = fst y + snd y == snd x
+                 where x = pair' n
+                       y = pair' $ fst x
+                    
+              
 
 
