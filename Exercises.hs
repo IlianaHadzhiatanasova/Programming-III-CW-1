@@ -43,8 +43,8 @@ sortType' xs = zip xs (tail xs)
 sortType xs | and [ x < y | (x,y) <- sortType' xs ] = Ascending
             | and [ x == y | (x,y) <- sortType' xs ] = Constant
             | and [ x <= y | (x,y) <- sortType' xs ] = NonDescending
-            | and [ x >= y | (x,y) <- sortType' xs ] = NonAscending
             | and [ x > y | (x,y) <- sortType' xs ] = Descending
+            | and [ x >= y | (x,y) <- sortType' xs ] = NonAscending
             | otherwise = NotSorted
 
 --Ex5 
@@ -119,6 +119,7 @@ encode xs = concat $ map (\x -> encode'' (encode' (ord x) 7)) xs
 
 
 --Ex11
+decode :: [Int] -> String
 decode' xs = chr $ sum [ a*(2^b) | (a,b) <- zip xs [length xs - 1, length xs - 2..0]]
 
 decode'' xs = even (sum (init xs) + (last xs)) 
@@ -142,11 +143,26 @@ makeChange n (x:xs) | length solutions >=1 = head $ sortBy (\a b -> compare (sum
                     | otherwise = [-1]
                      where solutions = [solution | y <- [0..n `div` x], let solution = y: makeChange (n - x*y) xs, length (filter (<0) solution) == 0]
 
---Ex13 numbers no bigger than the base 
-------------------------------------------------------------------------------
-------------------------------------------------------------------------------
-------------------------------------------------------------------------------
-------------------------------------------------------------------------------
+--Ex13
+goodsteinSequence :: (Int, [Int]) -> [(Int, [Int])]
+
+goodsteinSequence' (a, xs) =  sum [(a^i)*x | (x, i) <- zip xs [0..length xs]] 
+
+goodsteinSequence'' num base | num == 0 = []
+                             | otherwise = r : (goodsteinSequence'' d base)
+                             where d = num `div` base 
+                                   r = num `mod` base
+
+goodsteinSequence''' _ [] = []
+goodsteinSequence''' p (x:xs) | p x = x : goodsteinSequence''' p xs
+                              | otherwise = x : []
+
+goodsteinSequence (base, numbers) | maximum numbers >= base = []
+                                  | otherwise = goodsteinSequence''' (\(b,ys) -> length ys /= 0) $ result
+                                where result = iterate (\(b,ys) -> ((b+1), goodsteinSequence'' ((goodsteinSequence' (b+1,ys)) - 1) (b+1))) (base, numbers)
+
+
+
 
 --Ex14
 type Subst = Assoc Char Bool
@@ -178,7 +194,9 @@ isSat'''' a = map (zip vs) (isSat''' (length vs))
 isSat''''' :: Eq k => k -> Assoc k v -> v
 isSat''''' k t = head [v | (k', v) <- t, k == k']
 
-isSat s = [binding | binding <- isSat'''' s, isSat' binding s]
+isSat s | null bindings = []
+        | otherwise = [head bindings]
+          where bindings = [binding | binding <- isSat'''' s, isSat' binding s]
             
 
 --Ex15
@@ -196,11 +214,9 @@ isCantorPair n = fst y + snd y == snd x
                  where x = pair' n
                        y = pair' $ fst x
 
---TODO finish ex 13 
 --TODO add comments
---TODO check types 
---TODO test 
-                    
-              
+
+
+  
 
 
