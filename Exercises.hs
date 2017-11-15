@@ -154,21 +154,25 @@ decode' xs = chr $ sum [ a*(2^b) | (a,b) <- zip xs [length xs - 1, length xs - 2
 
 decode'' xs = even (sum (init xs) + (last xs)) 
 
-decode''' xs | length xs == 0 = [] 
+decode''' xs | null xs = [] 
              | length xs `mod` 9 /= 0 = []
              | length (filter (\x -> x/= 0 && x/= 1) xs) /= 0 = []
              | not (decode'' (take 9 xs)) = []
-             | otherwise = decode' (take 8 xs) : decode (drop 9 xs)  
+             | otherwise = decode' (take 8 xs) : decode (drop 9 xs) 
+ 
 ---------------------------------------------------------------------------------------------
 --Ex12
 ---------------------------------------------------------------------------------------------
 
 makeChange :: Integral t => t -> [t] -> [t]
-makeChange 0 [] = []
-makeChange n [] = [-1]
-makeChange n (x:xs) | length solutions >=1 = head $ sortBy (\a b -> compare (sum a) (sum b)) solutions
-                    | otherwise = [-1]
-                     where solutions = [solution | y <- [0..n `div` x], let solution = y: makeChange (n - x*y) xs, length (filter (<0) solution) == 0]
+makeChange' 0 [] = []
+makeChange' n [] = [-1]
+makeChange' n (x:xs) | length solutions >= 1 = head $ sortBy (\a b -> compare (sum a) (sum b)) solutions 
+                     | otherwise = [-1] -- replicate (length xs) (-1)
+                     where solutions = [solution | y <- [0..n `div` x], let solution = y: makeChange' (n - x*y) xs, length (filter (<0) solution) == 0]
+
+makeChange n xs | length (filter (==(-1)) (makeChange' n xs)) > 0 = replicate (length xs) (-1)
+                | otherwise = makeChange' n xs 
 
 ---------------------------------------------------------------------------------------------
 --Ex13
@@ -243,7 +247,7 @@ pair x y = y + (xysum) * (xysum +1) `div` 2
 pair' z = (x,y) 
           where t = floor ((sqrt(8 * (fromIntegral z) +1) -1) / 2)
                 x = (t*(t+3) `div` 2) - z
-                y = z - t * (t+1) `div` 2 
+                y = z - t * (t+1) `div` 2             
 
 
 
